@@ -67,11 +67,19 @@ if submitted:
     text_color = (60, 60, 60)
     accent_color = (255, 87, 34)
 
-    # 居中写法
-    def center_text(text, font, y):
-        w, _ = draw.textsize(text, font=font)
-        return ((W - w) // 2, y)
-
+    # ---------- 居中辅助函数（兼容 Pillow 10+） ----------
+def center_text(text, font, y):
+    """
+    返回文字左上角坐标 (x, y)，使其水平居中
+    """
+    # 用 textbbox 计算文字宽高（需要临时开一个 1×1 透明图）
+    tmp = Image.new("RGBA", (1, 1), (0, 0, 0, 0))
+    draw_tmp = ImageDraw.Draw(tmp)
+    left, top, right, bottom = draw_tmp.textbbox((0, 0), text, font=font)
+    w = right - left
+    h = bottom - top          # 如果后续需要高度也能用
+    x = (W - w) // 2
+    return (x, y)
     # 逐行绘制
     y_start = 200
     draw.text(center_text(line1, font_mid, y_start), line1, font=font_mid, fill=text_color)
